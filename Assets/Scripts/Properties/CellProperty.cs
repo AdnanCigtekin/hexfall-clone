@@ -11,7 +11,12 @@ namespace ObjectProperties
     {
         public Color color;
         public bool isSelected;
+        public bool markedForDestruction;
 
+        public void DestroyMe()
+        {
+            Destroy(gameObject);
+        }
 
     }
 }
