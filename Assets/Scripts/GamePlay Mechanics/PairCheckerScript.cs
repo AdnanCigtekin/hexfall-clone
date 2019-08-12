@@ -4,125 +4,131 @@ using UnityEngine;
 using GridSystem;
 using MapDesigner;
 
-public class PairCheckerScript : MonoBehaviour
+namespace GameManagement
 {
-    private MyGrid[] grids;
-    private MapDesignerProperties myProperties;
-    private SharedVariables sV;
-
-    private void Awake()
+    /// <summary>
+    /// This script is responsible for checking whether the map has matching pairs which needs to be destroyed.
+    /// </summary>
+    public class PairCheckerScript : MonoBehaviour
     {
-        grids = FindObjectsOfType<MyGrid>();
-        myProperties = FindObjectOfType<MapDesignerProperties>();
-        sV = FindObjectOfType<SharedVariables>();
-        CheckAllPairs();
-    }
+        private MyGrid[] grids;
+        private MapDesignerProperties myProperties;
+        private SharedVariables sV;
 
-    private void Update()
-    {
-        if (sV.willGroupCheck)
+        private void Awake()
         {
-            
-            CheckAllPairs();
+            grids = FindObjectsOfType<MyGrid>();
+            myProperties = FindObjectOfType<MapDesignerProperties>();
+            sV = FindObjectOfType<SharedVariables>();
+
         }
-    }
 
-    public void CheckAllPairs()
-    {
-        sV.willGroupCheck = false;
-
-
-
-
-        foreach (MyGrid item in grids)
+        private void Update()
         {
-            List<MyGrid> adjacentGrids = FindAdjacentGrids(item.transform);
-            CheckGivenPair(adjacentGrids, item);
-            
-        }
-        DestroyMarkedCells(grids);
-        sV.didGroupCheck = true;
-    }
-
-
-    private void CheckGivenPair(List<MyGrid> group, MyGrid selectedGrid)
-    {
-        int groupSize = group.ToArray().Length;
-        float cellPadding = myProperties.tilePadding;
-         
-        for (int i = 0; i < groupSize; i++)
-        {
-            for (int j = 0; j < groupSize; j++)
+            if (sV.willGroupCheck)
             {
-                if (i == j)
-                    continue;
-                float distBetween = Vector2.Distance(group[i].transform.position, group[j].transform.position);
-                if (distBetween <= cellPadding)
-                {
-                    MyGrid[] groupToPass = { group[i], group[j], selectedGrid };
-                    bool markedForDestruction = CheckSameColor(groupToPass);
 
-                    group[i].assignedCell.markedForDestruction = (!group[i].assignedCell.markedForDestruction) ? markedForDestruction : true;
-                    group[j].assignedCell.markedForDestruction = (!group[j].assignedCell.markedForDestruction) ? markedForDestruction : true;
-                    selectedGrid.assignedCell.markedForDestruction = (!selectedGrid.assignedCell.markedForDestruction) ? markedForDestruction : true;
+                CheckAllPairs();
+            }
+        }
+
+        public void CheckAllPairs()
+        {
+            sV.willGroupCheck = false;
+
+
+
+
+            foreach (MyGrid item in grids)
+            {
+                List<MyGrid> adjacentGrids = FindAdjacentGrids(item.transform);
+                CheckGivenPair(adjacentGrids, item);
+
+            }
+            DestroyMarkedCells(grids);
+            sV.didGroupCheck = true;
+        }
+
+
+        private void CheckGivenPair(List<MyGrid> group, MyGrid selectedGrid)
+        {
+            int groupSize = group.ToArray().Length;
+            float cellPadding = myProperties.tilePadding;
+
+            for (int i = 0; i < groupSize; i++)
+            {
+                for (int j = 0; j < groupSize; j++)
+                {
+                    if (i == j)
+                        continue;
+                    float distBetween = Vector2.Distance(group[i].transform.position, group[j].transform.position);
+                    if (distBetween <= cellPadding)
+                    {
+                        MyGrid[] groupToPass = { group[i], group[j], selectedGrid };
+                        bool markedForDestruction = CheckSameColor(groupToPass);
+
+                        group[i].assignedCell.markedForDestruction = (!group[i].assignedCell.markedForDestruction) ? markedForDestruction : true;
+                        group[j].assignedCell.markedForDestruction = (!group[j].assignedCell.markedForDestruction) ? markedForDestruction : true;
+                        selectedGrid.assignedCell.markedForDestruction = (!selectedGrid.assignedCell.markedForDestruction) ? markedForDestruction : true;
+                    }
                 }
             }
         }
-    }
 
-    private bool CheckSameColor(MyGrid[] group)
-    {
-        bool result = true;
-        Color defaultColor = group[0].assignedCell.color;
-        foreach (MyGrid item in group)
+        private bool CheckSameColor(MyGrid[] group)
         {
-            if (item.assignedCell == null)
+            bool result = true;
+            Color defaultColor = group[0].assignedCell.color;
+            foreach (MyGrid item in group)
             {
-                continue;
+                if (item.assignedCell == null)
+                {
+                    continue;
 
+                }
+                if (!item.assignedCell.color.Equals(defaultColor))
+                {
+                    result = false;
+                    break;
+                }
             }
-            if (!item.assignedCell.color.Equals(defaultColor))
-            {
-                result = false;
-                break;
-            }
-        }
-        return result;
-    }
-
-
-    private List<MyGrid> FindAdjacentGrids(Transform selectedGrid)
-    {
-        List<MyGrid> resultSet = new List<MyGrid>();
-
-        float cellPadding = myProperties.tilePadding;
-
-        foreach (MyGrid item in grids)
-        {
-            float tempDist = Vector2.Distance(selectedGrid.position, item.transform.position);
-            if (tempDist <= cellPadding && tempDist != 0)
-            {
-                resultSet.Add(item);
-            }
+            return result;
         }
 
-        return resultSet;
-    }
 
-
-    public void DestroyMarkedCells(MyGrid[] grids)
-    {
-        int gridSize = grids.Length;
-        for (int i = 0; i < gridSize; i++)
+        private List<MyGrid> FindAdjacentGrids(Transform selectedGrid)
         {
-            if (grids[i].assignedCell.markedForDestruction)
+            List<MyGrid> resultSet = new List<MyGrid>();
+
+            float cellPadding = myProperties.tilePadding;
+
+            foreach (MyGrid item in grids)
             {
-                grids[i].assignedCell.DestroyMe();
-
+                float tempDist = Vector2.Distance(selectedGrid.position, item.transform.position);
+                if (tempDist <= cellPadding && tempDist != 0)
+                {
+                    resultSet.Add(item);
+                }
             }
+
+            return resultSet;
         }
-        
+
+
+        public void DestroyMarkedCells(MyGrid[] grids)
+        {
+            int gridSize = grids.Length;
+            for (int i = 0; i < gridSize; i++)
+            {
+                if (grids[i].assignedCell.markedForDestruction)
+                {
+                    grids[i].assignedCell.DestroyMe();
+
+                }
+            }
+
+        }
+
+
     }
-
-
 }

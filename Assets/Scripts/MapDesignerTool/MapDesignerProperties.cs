@@ -17,7 +17,7 @@ namespace MapDesigner
         public Color[] colors = new Color[0];
         public int colorCount = 1;
         public string levelName = "myLevel";
-
+        public GameObject explosionParticle;
 
     }
 }

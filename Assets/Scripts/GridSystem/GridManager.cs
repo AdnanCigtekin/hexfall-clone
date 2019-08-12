@@ -1,10 +1,12 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
-using ObjectProperties;
 using MapDesigner;
+
 namespace GridSystem
 {
+    /// <summary>
+    /// This script is responsible for Grids as a whole. It contains the function which has capabilities of managing grids as a whole.
+    /// </summary>
     public class GridManager : MonoBehaviour
     {
         public List<MyGrid> grids;
