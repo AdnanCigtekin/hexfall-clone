@@ -9,6 +9,7 @@ namespace MapDesigner
     /// <summary>
     /// Main code for level design tool.
     /// </summary>
+   #if UNITY_EDITOR
     public class MapDesignerCore : EditorWindow
     {
 
@@ -39,6 +40,8 @@ namespace MapDesigner
 
         public static MapDesignerProperties inGamePropertyObject;
 
+        private GridSystem.GridManager gridProp;
+
         [MenuItem("Window/Map Designer")]
         static void Init()
         {
@@ -55,8 +58,22 @@ namespace MapDesigner
             if (tempOldLevel != null)
             {
                 oldLevel = tempOldLevel;
+                ToggleRealLevelRenderer(false);
+
             }
+
             inGamePropertyObject = GameObject.FindObjectOfType<MapDesignerProperties>();
+            gridProp = inGamePropertyObject.GetComponent<GridSystem.GridManager>();
+        }
+
+        void ToggleRealLevelRenderer(bool enabledRenderer)
+        {
+            if (oldLevel == null)
+                return;
+            foreach (Transform item in oldLevel.transform)
+            {
+                item.GetComponent<SpriteRenderer>().enabled = enabledRenderer;
+            }
         }
 
         // Read the JSON file from the "propertiesPath".
@@ -98,34 +115,56 @@ namespace MapDesigner
         {
           //  File.WriteAllText(Application.dataPath + propertiesPath, JsonUtility.ToJson(myProperties));
             inGamePropertyObject = myProperties;
+            
         }
 
         // Generate the real level object which will be played by the player.
         void GenerateLevel()
         {
-            DestroyImmediate(oldLevel);
+            
 
             if (objList.ToArray().Length != 0)
             {
+                DestroyImmediate(oldLevel);
                 Transform newParent = new GameObject().transform;
                 newParent.name = myProperties.levelName;
                 int i = 0;
+
+                GridSystem.MyGrid[] grids = GameObject.FindObjectsOfType<GridSystem.MyGrid>();
+                int j = 0;
+                if (grids.Length != 0)
+                {
+                    while (j != grids.Length - 1)
+                    {
+                        grids[j].DestroyMe();
+                       // DestroyImmediate(grids[j].transform);
+                        j++;
+                    }
+                }
+
+
                 foreach (GameObject item in objList)
                 {
                     GameObject newObj = Instantiate(item, item.transform.position, Quaternion.identity);
                     newObj.transform.parent = newParent;
                     newObj.name = "Cell-" + i;
-                    newObj.AddComponent<ObjectProperties.CellProperty>();
-                    newObj.GetComponent<ObjectProperties.CellProperty>().color = item.GetComponent<SpriteRenderer>().color;
+                    ObjectProperties.CellProperty tempCellProp = newObj.AddComponent<ObjectProperties.CellProperty>();
+
+                    tempCellProp.color = item.GetComponent<SpriteRenderer>().color;
+                    tempCellProp.currentGrid = gridProp.GenerateGrid(newObj.transform.position,i,newObj.GetComponent<ObjectProperties.CellProperty>());
+                   
                     i++;
                 }
+                oldLevel = newParent.gameObject;
             }
+            
         }
 
         //Clean & Save everything
         private void OnDestroy()
         {
             CleanTemporaryObjects();
+            ToggleRealLevelRenderer(true);
            // SaveDefaults();
         }
 
@@ -192,6 +231,7 @@ namespace MapDesigner
         {
             if (willUpdate && myProperties.tileObj != null)
             {
+                ToggleRealLevelRenderer(false);
                 CleanTemporaryObjects();
                 GameObject tempObj;
                 
@@ -255,4 +295,5 @@ namespace MapDesigner
         }
 
     }
+#endif
 }
