@@ -10,7 +10,7 @@ namespace MapDesigner
     /// Main code for level design tool.
     /// </summary>
 #if UNITY_EDITOR
-    [System.Serializable]
+    [Serializable]
     public class MapDesignerCore : EditorWindow
     {
 
@@ -40,7 +40,7 @@ namespace MapDesigner
         private  MapDesignerProperties myProperties;
 
         //Used for setting the editor properties for ingame property object.
-        public static MapDesignerProperties inGamePropertyObject;
+        public  MapDesignerProperties inGamePropertyObject;
 
         private GridManager gridProp;
 

@@ -123,6 +123,7 @@ namespace MapDesigner
             currentGrid.assignedCell = null;
             sV.cellQueue.Add(this, topGrid);
             markedForDestruction = false;
+            FindObjectOfType<SharedVariables>().score += 5;
         }
 
         private MyGrid GetTopGrid(MyGrid currentGrid)

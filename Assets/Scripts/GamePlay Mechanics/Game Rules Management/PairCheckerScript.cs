@@ -47,7 +47,7 @@ namespace GameManagement
                 
                 foreach (MyGrid grid in grids)
                 {
-                    if (grid.assignedCell.markedForDestruction)
+                    if (grid.assignedCell != null && grid.assignedCell.markedForDestruction)
                     {
                         sV.thereIsDestruction = true;
                         break;

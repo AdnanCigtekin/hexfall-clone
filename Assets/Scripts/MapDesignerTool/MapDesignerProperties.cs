@@ -6,6 +6,7 @@ namespace MapDesigner
     /// <summary>
     /// Property object for Map Designer Tool.
     /// </summary>
+    [System.Serializable]
     public class MapDesignerProperties : MonoBehaviour
     {
         public int horizontalAmount = 8;

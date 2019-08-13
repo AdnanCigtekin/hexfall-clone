@@ -24,45 +24,68 @@ namespace GamePlay
             gPSV = GetComponent<GamePlaySharedVariables>();
         }
         private float moveTimer;
-        private float maxTimer = 0.5f;
+        private readonly float maxTimer = 0.5f;
 
         private int lastMoveDir;
         private int moveRemaining = 2;
+        private bool doingRoll = false;
+
+
         // Update is called once per frame
         void Update()
         {
-            if (gPSV.thereIsDestruction)
-            {
-                Moving = false;
-                moveDir = 0;
-                moveRemaining = 2;
-                moveTimer = 0;
-                return;
-            }
-          //  Debug.Log("Sliding : " + isSliding);
+            CheckMovable();
+            //  Debug.Log("Sliding : " + isSliding);
+            DoSlideRoll();
+            DetectMove();
+
+        }
+
+        private void DoSlideRoll()
+        {
             if (Moving)
             {
                 moveTimer += Time.deltaTime;
                 if (moveTimer > maxTimer)
                 {
                     moveTimer = 0;
+                    slidePair();
                     if (moveRemaining == 0)
                     {
                         Moving = false;
                         moveDir = 0;
                         moveRemaining = 3;
+                        doingRoll = false;
                     }
-                    moveRemaining--;
-                    slidePair();
+                   
+                   
                 }
             }
-            if (moveDir != 0 && !Moving && moveTimer == 0 && selectedGrids != null)
+        }
+
+        private void CheckMovable()
+        {
+            if (gPSV.thereIsDestruction)
+            {
+                doingRoll = false;
+                Moving = false;
+                moveDir = 0;
+                moveRemaining = 3;
+                moveTimer = 0;
+                return;
+            }
+        }
+
+        private void DetectMove()
+        {
+            if (moveDir != 0 && !Moving && moveTimer == 0 && selectedGrids != null && !doingRoll)
             {
                 if (moveRemaining > 0)
                 {
                     lastMoveDir = moveDir;
+                    
                 }
-                
+
                 //Move Clockwise
                 if (moveDir < 0)
                 {
@@ -79,12 +102,12 @@ namespace GamePlay
                 }
                 slidePair();
             }
-
         }
 
         private void slidePair()
         {
-            if (moveDir > 0)
+            doingRoll = true;
+            if (lastMoveDir > 0)
             {
                 selectedGrids[0].assignedCell.currentGrid = selectedGrids[1];   //Cell[A]   ->   Grid[2]
                 CellProperty temp = selectedGrids[1].assignedCell;              //var temp  =    Cell[B]
@@ -97,7 +120,7 @@ namespace GamePlay
                 tempTwo.currentGrid = selectedGrids[0];
                 selectedGrids[0].assignedCell = tempTwo;
             }
-            else if(moveDir < 0)
+            else if(lastMoveDir < 0)
             {
                 Debug.Log("going counterclockwise");
 
@@ -113,37 +136,9 @@ namespace GamePlay
                 selectedGrids[0].assignedCell = tempTwo;
             }
 
-
+            moveRemaining--;
             gPSV.isSliding = false;
 
-            //if (moveDir < 0)
-            //{
-
-            //    for (int i = 0; i < selectedGridLength; i++)
-            //    {
-            //        int index = i +1;
-            //        if (index == selectedGridLength)
-            //        {
-            //            index = 0;
-            //        }
-            //        selectedGrids[i].assignedCell.currentGrid = tempGrids[index];
-            //        selectedGrids[index].assignedCell = tempGrids[i].assignedCell;
-            //      //  selectedGrids[index].assignedCell = tempGrids[i].assignedCell;
-            //    }
-            //}
-            //else
-            //{
-            //    for (int i = 0; i < selectedGridLength; i++)
-            //    {
-            //        int index = i + 1;
-            //        if (index == selectedGridLength)
-            //        {
-            //            index = 0;
-            //        }
-            //        selectedGrids[i].assignedCell.currentGrid = tempGrids[index];
-            //        selectedGrids[index].assignedCell = tempGrids[i].assignedCell;
-            //    }
-            //}
 
         }
 

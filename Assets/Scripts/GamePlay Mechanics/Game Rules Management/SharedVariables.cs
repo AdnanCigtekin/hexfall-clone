@@ -29,7 +29,7 @@ namespace GameManagement
             }
         }
         private GamePlay.GamePlaySharedVariables gPSV;
-
+        public int score;
         private void Awake()
         {
             gPSV = GetComponent<GamePlay.GamePlaySharedVariables>();
