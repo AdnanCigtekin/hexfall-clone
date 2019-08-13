@@ -116,7 +116,7 @@ namespace MapDesigner
                 int j = 0;
                 if (grids.Length != 0)
                 {
-                    while (j != grids.Length - 1)
+                    while (j != grids.Length)
                     {
                         grids[j].DestroyMe();
                         j++;
@@ -127,13 +127,16 @@ namespace MapDesigner
                 foreach (GameObject item in objList)
                 {
                     GameObject newObj = Instantiate(item, item.transform.position, Quaternion.identity);
-                    newObj.transform.parent = newParent;
+                    
                     newObj.name = "Cell-" + i;
                     CellProperty tempCellProp = newObj.AddComponent<CellProperty>();
                     tempCellProp.explosionParticle = myProperties.explosionParticle;
+                    tempCellProp.borderObject = Instantiate(myProperties.borderObject, tempCellProp.transform.position, Quaternion.identity);
+                    tempCellProp.borderObject.transform.parent = newObj.transform;
+                    
                     tempCellProp.color = item.GetComponent<SpriteRenderer>().color;
                     tempCellProp.currentGrid = gridProp.GenerateGrid(newObj.transform.position,i,newObj.GetComponent<CellProperty>());
-                   
+                    newObj.transform.parent = newParent;
                     i++;
                 }
                 oldLevel = newParent.gameObject;
@@ -175,9 +178,10 @@ namespace MapDesigner
             myProperties.horizontalAmount = EditorGUILayout.IntSlider("X", myProperties.horizontalAmount, 0, myProperties.horizontalUpperLimit);
             myProperties.verticalAmount = EditorGUILayout.IntSlider("Y", myProperties.verticalAmount, 0, myProperties.verticalUpperLimit);
 
-            myProperties.tileObj = (GameObject)EditorGUILayout.ObjectField(myProperties.tileObj, typeof(GameObject), false);
+            myProperties.tileObj = (GameObject)EditorGUILayout.ObjectField("Cell Object",myProperties.tileObj, typeof(GameObject), false);
 
-            myProperties.explosionParticle = (GameObject)EditorGUILayout.ObjectField(myProperties.explosionParticle, typeof(GameObject), false);
+            myProperties.explosionParticle = (GameObject)EditorGUILayout.ObjectField("Destroy Effect",myProperties.explosionParticle, typeof(GameObject), false);
+            myProperties.borderObject = (GameObject)EditorGUILayout.ObjectField("Border Effect",myProperties.borderObject, typeof(GameObject), false);
 
             myProperties.tilePadding = EditorGUILayout.FloatField("Padding", myProperties.tilePadding);
 

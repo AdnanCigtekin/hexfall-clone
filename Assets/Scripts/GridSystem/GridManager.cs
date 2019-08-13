@@ -12,7 +12,14 @@ namespace GridSystem
         public List<MyGrid> grids;
         [SerializeField]
         private Transform gridObject;
-        private MapDesignerProperties mapProperties;
+        public MapDesignerProperties mapProperties;
+
+        public void Awake()
+        {
+            mapProperties = GetComponent<MapDesignerProperties>();
+
+        }
+
         public MyGrid GenerateGrid(Vector2 newPos, int id, CellProperty newCell)
         {
             if (id == 0)
