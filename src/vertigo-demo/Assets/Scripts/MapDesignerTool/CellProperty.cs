@@ -47,6 +47,7 @@ namespace MapDesigner
         private GridManager gM;
         private MapDesignerProperties mapProperties;
         private SharedVariables sV;
+        private Sprite defaultSprite;
         public bool isBomb = false;
         private int pBombRemainingTurn;
         public int bombRemainingTurn
@@ -73,7 +74,9 @@ namespace MapDesigner
 
         private void Awake()
         {
-            GetComponent<SpriteRenderer>().sortingOrder = -10;
+            SpriteRenderer renderer = GetComponent<SpriteRenderer>();
+            defaultSprite = renderer.sprite;
+            renderer.sortingOrder = -10;
             borderObject.GetComponent<SpriteRenderer>().enabled = isSelected;
             bombAlerter = transform.Find("Canvas/Counter").GetComponent<Text>();
             targetPos = currentGrid.transform.position;
@@ -166,6 +169,10 @@ namespace MapDesigner
                 isBomb = true;
                 bombRemainingTurn = mapProperties.BombExplosionTime;
                 GetComponent<SpriteRenderer>().sprite = mapProperties.bombSprite;
+            }
+            else
+            {
+                GetComponent<SpriteRenderer>().sprite = defaultSprite;
             }
 
             #endregion
