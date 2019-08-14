@@ -91,22 +91,25 @@ namespace GamePlay
                     lastMoveDir = moveDir;
                     
                 }
+                if (!DetectUnselected())
+                {
+                    //Move Clockwise
+                    if (moveDir < 0)
+                    {
+                        Moving = true;
+                        Debug.Log("Moving clockwise: " + selectedGrids[0].assignedCell.name);
+                        moveTimer = 0;
+                    }
+                    //Move Counter-clockwise
+                    else
+                    {
+                        Moving = true;
+                        Debug.Log("Moving counter-clockwise: " + selectedGrids[0].assignedCell.name);
+                        moveTimer = 0;
+                    }
+                    slidePair();
+                }
 
-                //Move Clockwise
-                if (moveDir < 0)
-                {
-                    Moving = true;
-                    Debug.Log("Moving clockwise: " + selectedGrids[0].assignedCell.name);
-                    moveTimer = 0;
-                }
-                //Move Counter-clockwise
-                else
-                {
-                    Moving = true;
-                    Debug.Log("Moving counter-clockwise: " + selectedGrids[0].assignedCell.name);
-                    moveTimer = 0;
-                }
-                slidePair();
             }
         }
 
@@ -147,7 +150,20 @@ namespace GamePlay
 
 
         }
-
+        //return false if there is no cell seems unselected and actually unselected
+        //return true  if there is no cell seems unselected but actually selected
+        //
+        private bool DetectUnselected()
+        {
+            foreach (MyGrid item in selectedGrids)
+            {
+                if (!item.assignedCell.isSelected)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
 
         public void SelectCell(MyGrid selectedCell)
         {
